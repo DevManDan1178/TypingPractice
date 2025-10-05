@@ -1,21 +1,27 @@
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 
 /**
  *
  * @author nagatd
  */
 public class TypingController {
-    
-    private static final HashMap<String, String> SYMBOL_MAP = new HashMap() {
+    //STATIC VALUES - KEYS 
+    private static final HashMap<String, String> KEYCODE_TO_SYMBOL = new HashMap() {
         {
             put("PERIOD", ".");
             put("SLASH", "/");
@@ -35,6 +41,16 @@ public class TypingController {
             }
         }
     };
+    
+    private static final HashMap<String, Function<String, String>> SYMBOL_FUNCTIONS = new HashMap() {
+        {
+            put("←", (Function<String, String>) (String str) -> str.substring(0, str.length() - 1));
+            put("SPACE", (Function<String, String>) (String str) -> str + " ");
+            put("ENTER", (Function<String, String>) (String str) -> str + "\n");
+            put("⇧ Shift", Function.identity());
+        }
+    };
+    
     private static final String[][] KEYBOARD_CHARACTERS = {
         {"`","1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "←"},
         {"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"}, 
@@ -52,15 +68,28 @@ public class TypingController {
         }
     };
     
+    //STATIC VALUES - UI DISPLAY
     private static final double DEFAULT_KEY_SIZE = 50.0;
     private static final double VERTICAL_SPACING = 5;
     private static final double HORIZONTAL_SPACING = 5;
+    
+    //NON-STATIC VALUES
+    private boolean shiftPressed = false;
+    private HashMap<String, Button> keyboardMap;
+    private GridPane keyboardGrid;
+    
+    public TypingController() {
+        keyboardGrid = new GridPane();
+        keyboardMap = createKeyboard(keyboardGrid);
+    }
+    
+    //STATIC FUNCTIONS - KEYBOARD
     /**
      * Displays the virtual keyboard and returns a map of the keys
      * @param keyboardGrid Parent GridPane containing the keyboard
      * @return map of key buttons with their own key string
      */
-    public static HashMap<String, Button> DisplayOntoRootPane(GridPane keyboardGrid) {
+    public static HashMap<String, Button> createKeyboard(GridPane keyboardGrid) {
         HashMap<String, Button> keyboardMap = new HashMap();
         for (int i = 0; i < KEYBOARD_CHARACTERS.length; i++) {
             String[] rowCharacters = KEYBOARD_CHARACTERS[i];
@@ -86,8 +115,67 @@ public class TypingController {
      * @param keyCode
      * @return String for the key in the keyboard
      */
-    public static String getKeyString(KeyCode keyCode) {
+    public static String getKeySymbol(KeyCode keyCode) {
         String keyStr = keyCode.toString();
-        return SYMBOL_MAP.getOrDefault(keyStr, keyStr);
+        return KEYCODE_TO_SYMBOL.getOrDefault(keyStr, keyStr);
     }
+    
+    /**
+     * Gets the event handler for keyboard pressing / letting go
+     * @param keyboardMap map of keyboard symbols to their buttons
+     * @param pressed is the event for key pressed or key released?
+     * @param processFunction function to call by event handler after the key is confirmed to be a keyboard key (key symbol -> void)
+     * @Param shiftPressedCheck predicate to check when shift is pressed
+     * @return the corresponding event handler
+     */
+    public EventHandler<KeyEvent> getKeyEventHandler(boolean pressed, Consumer<String> processFunction) {
+        String style = pressed ? "-fx-background-color: #ff0000;" : "";
+        return (KeyEvent event) -> {
+            String keySymbol = TypingController.getKeySymbol(event.getCode()); 
+            Button keyboardButton = keyboardMap.get(keySymbol);
+            if (keyboardButton == null) {
+                return;
+            }
+            keyboardButton.setStyle(style);
+            
+            if (keySymbol.equals("⇧ Shift")) {
+                shiftPressed = pressed;
+                return;
+            }
+            
+            if (processFunction != null) {
+                if(keySymbol.length() == 1 && Character.isLetter(keySymbol.toCharArray()[0])) {
+                    char symbol = keySymbol.toCharArray()[0];
+                    processFunction.accept((shiftPressed ? Character.toUpperCase(symbol) : Character.toLowerCase(symbol)) + "");
+                    return;
+                }
+                processFunction.accept(keySymbol);
+            }
+        };
+    }
+    
+    //STATIC FUNCTIONS - TEXT DISPLAY
+    
+    public static Label getTextDisplay() {
+        Label txtLabel = new Label();
+        txtLabel.setMinSize(DEFAULT_KEY_SIZE * 8, DEFAULT_KEY_SIZE);
+        txtLabel.setFont(Font.font("Arial", 20));
+        return txtLabel;
+    }
+    
+    /**
+     * Applies the symbol to the string
+     * @param startStr initial string
+     * @param symbol symbol to apply
+     * @return the new string
+     */
+    public static String applySymbolToString(String startStr, String symbol) {
+        return SYMBOL_FUNCTIONS.getOrDefault(symbol, (Function<String, String>) (String str) -> (str + symbol)).apply(startStr);
+    }
+    
+    public GridPane getKeyboardGrid() {
+        return keyboardGrid;
+    }
+    
 }
+
