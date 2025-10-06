@@ -12,7 +12,9 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextFlow;
 
@@ -75,13 +77,12 @@ public class TypingController {
     private static final double VERTICAL_SPACING = 5;
     private static final double HORIZONTAL_SPACING = 5;
     private static final double TEXT_TYPING_FONT_SIZE = 30;
-
     
     
     //NON-STATIC VALUES
     
     //UI
-    private GridPane grid;
+    private VBox root;
     private HashMap<String, Button> keyboardMap;
     private GridPane keyboardGrid;
     private TextFlow typingTextFlow;
@@ -92,19 +93,63 @@ public class TypingController {
 
     
     public TypingController() {
-        grid = new GridPane();
-        
+        root = new VBox();
+        root.setAlignment(Pos.CENTER);
+        root.setSpacing(25);
         keyboardGrid = new GridPane();
         keyboardMap = createKeyboard(keyboardGrid);
         
-
-        typingTextFlow = new TextFlow();
+        HBox hBox = new HBox();
+        hBox.setSpacing(25);
+        hBox.setAlignment(Pos.CENTER);
+        //Controls
+        VBox controlsVBox = new VBox();
+        controlsVBox.setSpacing(10);
         
-        grid.add(typingTextFlow, 0, 1);
-        grid.add(keyboardGrid, 0, 2);
-        grid.setAlignment(Pos.CENTER);
+        Label controlsTitle = new Label("CONTROLS");
+        controlsTitle.setFont(Font.font(30));
+        controlsVBox.getChildren().add(controlsTitle);
+        
+        Button resetButton = createButton("RESET");
+        controlsVBox.getChildren().add(resetButton);
+        resetButton.setFocusTraversable(false);
+        
+        Button nextButton = createButton("NEXT LINE");
+        controlsVBox.getChildren().add(nextButton);
+        nextButton.setFocusTraversable(false);
+        
+        //Stats
+        VBox statsVBox = new VBox();
+        statsVBox.setSpacing(20);
+        
+        Label statsTitle = new Label("STATS");
+        statsTitle.setFont(Font.font(30));
+        statsVBox.getChildren().add(statsTitle);
+        
+        Label accuracyLabel = new Label("Accuracy : ?/?");
+        accuracyLabel.setFont(Font.font(25));
+        statsVBox.getChildren().add(accuracyLabel);
+        
+        Label lineCountLabel = new Label("Line ?/?");
+        lineCountLabel.setFont(Font.font(25));
+        statsVBox.getChildren().add(lineCountLabel);
+        
+        //Text typing
+        typingTextFlow = new TextFlow();
+        //Structure
+        hBox.getChildren().add(controlsVBox);  
+        hBox.getChildren().add(statsVBox);
+        root.getChildren().add(hBox);
+        root.getChildren().add(typingTextFlow);
+        root.getChildren().add(keyboardGrid);
+        root.setAlignment(Pos.CENTER);
     }
     
+    private Button createButton(String buttonTitle) {
+        Button btn = new Button(buttonTitle);
+        btn.setMinSize(DEFAULT_KEY_SIZE * 3, DEFAULT_KEY_SIZE);
+        return btn;
+    }
     //For typing -> display the  text and if typed incorrectly, replace letters with red
     
     /**
@@ -166,7 +211,6 @@ public class TypingController {
      * In the text flow, creates labels of texts of regular (correct) or red (incorrect) strings with respect to the typed text and the goal text
      */
     private void displayTypedText() {
-        System.out.println(typedString + "\n" + goalString);
         typingTextFlow.getChildren().clear();
         int compareStrLength = Math.min(typedString.length(), goalString.length());
         //Break text into a list of indexes to seperate
@@ -174,8 +218,7 @@ public class TypingController {
         boolean lastCorrect = true;
         Label lastLabel = null;
         for (int i = 0; i < compareStrLength; i++) {
-            boolean isCorrect = goalString.charAt(i) == typedString.charAt(i);
-            
+            boolean isCorrect = goalString.charAt(i) == typedString.charAt(i);          
             //If the current letter is the same (correct/incorrect) as previous(es), then continue until finding another index
             if (lastCorrect == isCorrect && i > 0 && i != compareStrLength - 1) { 
                 continue;
@@ -201,7 +244,6 @@ public class TypingController {
             return;
         }
         String restOfText = (typedString.length() > goalString.length() ? typedString : goalString).substring(compareStrLength);
-        System.out.println(restOfText);
         Label lbl = new Label(restOfText);
         lbl.setFont(Font.font(TEXT_TYPING_FONT_SIZE));
         lbl.setStyle(typedString.length() > goalString.length() ? "-fx-background-color: #ffb24d;" : "");
@@ -240,8 +282,8 @@ public class TypingController {
         return errorCount;
     }
     
-    public GridPane getGrid() {
-        return grid;
+    public VBox getRoot() {
+        return root;
     }
     
     
