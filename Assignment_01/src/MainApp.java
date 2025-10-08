@@ -18,7 +18,7 @@ public class MainApp extends Application {
         "The quick brown fox jumps over the lazy dog.",
         "Five big quacking zephyrs jolt my wax bed.",
         "Sympathizing would fix Quaker objectives.",
-        "A large fawn jumped quickly over white zinc boxes."
+        "A large fawn jumped quickly over white zinc boxes.",
     };
     /**
      * @param args the command line arguments
@@ -35,7 +35,7 @@ public class MainApp extends Application {
         BorderPane root = new BorderPane();
         TypingController typingController = new TypingController(PRACTICE_STRINGS);
         root.setCenter(typingController.getRoot());
-        Scene scene = new Scene(root, 900, 600);
+        Scene scene = new Scene(root, 900, 800);
         scene.setOnKeyPressed(typingController.getKeyEventHandler(true));
         scene.setOnKeyReleased(typingController.getKeyEventHandler(false));
         primaryStage.setScene(scene);
