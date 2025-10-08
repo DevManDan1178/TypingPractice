@@ -1,11 +1,7 @@
-
 import java.util.HashMap;
-import java.util.function.Function;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
@@ -19,26 +15,17 @@ import javafx.scene.text.TextFlow;
 
 /**
  *
- * @author nagatd
+ * @author Daniel Orejuela Liu
  */
 public class TypingController {
     //STATIC VALUES - KEYS 
     private static final HashMap<String, String> KEYCODE_TO_SYMBOL = new HashMap() {
         {
-            put("PERIOD", ".");
-            put("SLASH", "/");
-            put("SEMICOLON", ";");
-            put("BACK_SPACE", "←");
-            put("QUOTE", "'");
-            put("BACK_SLASH", "\\");
-            put("SHIFT", "⇧ Shift");
-            put("COMMA", ",");
-            put("OPEN_BRACKET", "[");
-            put("CLOSE_BRACKET", "]");
-            put("BACK_QUOTE", "`");
-            put("MINUS", "-");
-            put("EQUALS", "=");
-            put("CAPS_LOCK", "CAPS");
+            String[] keyCodes = {"PERIOD", "SLASH", "SEMICOLON", "BACK_SPACE", "QUOTE", "BACK_SLASH", "COMMA", "OPEN_BRACKET", "CLOSE_BRACKET", "BACK_QUOTE", "MINUS", "EQUALS", "CAPS_LOCK", "SHIFT"};
+            String[] symbols = {".", "/", ";", "←", "'", "\\", ",", "[", "]", "`", "-", "=", "CAPS", "⇧ Shift"};
+            for (int i = 0; i < keyCodes.length; i++) {
+                put(keyCodes[i], symbols[i]);
+            }
             for (int i = 0; i < 10; i++) {
                 put("DIGIT" + String.valueOf(i), String.valueOf(i));
             }
@@ -47,10 +34,10 @@ public class TypingController {
     
     private static final HashMap<String, String> SHIFTLOCK_SYMBOLS = new HashMap() {
         {
-            String[] preShift = {"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=","[", "]", "\\", ";", "\'", ",", ".", "/"};
-            String[] postShift = {"~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", "{", "}", "|", ":", "\"", "<", ">", "?"};
-            for (int i = 0; i < preShift.length; i++) {
-                put(preShift[i], postShift[i]);
+            String preShift = "`1234567890-=[]\\;',./";
+            String postShift = "~!@#$%^&*()_+{}|:\"<>?";
+            for (int i = 0; i < preShift.length(); i++) {
+                put(preShift.charAt(i) + "", postShift.charAt(i) + "");
             }
         }
     };
@@ -79,7 +66,7 @@ public class TypingController {
     private static final double VERTICAL_SPACING = 5;
     private static final double HORIZONTAL_SPACING = 5;
     private static final double TEXT_TYPING_FONT_SIZE = 30;
-    private static double STATS_FONT_SIZE = 25;
+    private static final double STATS_FONT_SIZE = 25;
     
     //NON-STATIC VALUES
     
@@ -377,7 +364,6 @@ public class TypingController {
     private void setTypedString(String str) {
         typedString = str;
         displayTypedText();
-        int characterCount = str.length();
         accuracyLabel.setText(String.format("Accuracy : %s/%s", totalTypedCharacters - totalErrors, totalTypedCharacters));
         errorCountLabel.setText(String.format("Errors : %s", getErrorCount()));
     }
@@ -397,18 +383,7 @@ public class TypingController {
         return errorCount;
     }
 
-     
-     /**
-     * DEPRECATED - Applies the symbol to the string
-     * @param startStr initial string
-     * @param symbol symbol to apply
-     * @return the new string
-     
-    public static String applySymbolToString(String startStr, String symbol) {
-        return SYMBOL_FUNCTIONS.getOrDefault(symbol, (Function<String, String>) (String str) -> (str + symbol)).apply(startStr);
-    }
-    */
-    
+
     /**
      * Gets the typed symbol depending on if shift is pressed
      * @param keySymbol the symbol of the key
