@@ -19,6 +19,11 @@ public class MainApp extends Application {
         "Five big quacking zephyrs jolt my wax bed.",
         "Sympathizing would fix Quaker objectives.",
         "A large fawn jumped quickly over white zinc boxes.",
+        "What if there were \"special\" symbols?",
+        "I paid 100$ for 10% of a fish & chips company's stock.",
+        "Something cool: [triangles] <| |> /\\",
+        "System.out.println(NO_MORE_LINES_ALERT + \"- I guess this is it?\")"
+
     };
     /**
      * @param args the command line arguments
