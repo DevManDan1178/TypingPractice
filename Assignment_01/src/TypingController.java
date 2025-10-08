@@ -93,7 +93,7 @@ public class TypingController {
             put("←", (Runnable) () -> {setTypedString(typedString.substring(0, Math.max(0, typedString.length() - 1)));});
             put("SPACE", (Runnable) () -> {addTypedSymbolToTypedString(" ");});
             put("ENTER", (Runnable) () -> {checkLineComplete();});
-            put("TAB", (Runnable) () -> {addTypedSymbolToTypedString("	");});
+            put("TAB", (Runnable) () -> {addTypedSymbolToTypedString("  ");});
             put("⇧ Shift", (Runnable) () -> {}); //handled in input processing
             put("CAPS", (Runnable) () -> {capsToggled = !capsToggled;});
         }
