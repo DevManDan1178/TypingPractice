@@ -45,6 +45,16 @@ public class TypingController {
         }
     };
     
+    private static final HashMap<String, String> SHIFTLOCK_SYMBOLS = new HashMap() {
+        {
+            String[] preShift = {"`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=","[", "]", "\\", ";", "\'", ",", ".", "/"};
+            String[] postShift = {"~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", "{", "}", "|", ":", "\"", "<", ">", "?"};
+            for (int i = 0; i < preShift.length; i++) {
+                put(preShift[i], postShift[i]);
+            }
+        }
+    };
+    
     private static final String[][] KEYBOARD_CHARACTERS = {
         {"`","1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "←"},
         {"TAB", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "[", "]", "\\"}, 
@@ -74,13 +84,14 @@ public class TypingController {
     //NON-STATIC VALUES
     
     //UI
-    private VBox root;
-    private HashMap<String, Button> keyboardMap;
-    private GridPane keyboardGrid;
-    private TextFlow typingTextFlow;
-    private Label accuracyLabel;
-    private Label errorCountLabel;
-    private Label lineCountLabel;
+    private final VBox root;
+    private final HashMap<String, Button> keyboardMap;
+    private final GridPane keyboardGrid;
+    private final TextFlow typingTextFlow;
+    private final Label accuracyLabel;
+    private final Label errorCountLabel;
+    private final Label lineCountLabel;
+    private final Label errorMessageLabel;
     
     //Variables
     private boolean shiftPressed = false;
@@ -150,6 +161,11 @@ public class TypingController {
         lineCountLabel.setFont(Font.font(STATS_FONT_SIZE));
         statsVBox.getChildren().addAll(statsTitle, accuracyLabel, errorCountLabel, lineCountLabel);
         
+        //Error message 
+        errorMessageLabel = new Label("");
+        errorMessageLabel.setFont(Font.font(25));
+        errorMessageLabel.setStyle("-fx-background-color: #ff0000;");
+        
         //Text typing
         typingTextFlow = new TextFlow();
         typingTextFlow.setTextAlignment(TextAlignment.CENTER);
@@ -160,7 +176,7 @@ public class TypingController {
         hBox.setSpacing(150);
         hBox.setAlignment(Pos.CENTER);
         
-        root.getChildren().addAll(hBox, typingTextFlow, keyboardGrid);    
+        root.getChildren().addAll(hBox, typingTextFlow, keyboardGrid, errorMessageLabel);    
         root.setAlignment(Pos.CENTER);
         root.setAlignment(Pos.CENTER);
         root.setSpacing(25);
@@ -219,10 +235,13 @@ public class TypingController {
         return (KeyEvent event) -> {
             String keySymbol = TypingController.getKeySymbol(event.getCode()); 
             Button keyboardButton = keyboardMap.get(keySymbol);
+            
+            errorMessageLabel.setVisible(keyboardButton == null);
             if (keyboardButton == null) {
                 showInvalidKeyAlert(keySymbol);
                 return;
             }
+            
             keyboardButton.setStyle(style);
             
             if (keySymbol.equals("⇧ Shift")) {
@@ -232,7 +251,6 @@ public class TypingController {
             
             if (pressed) {
                 applySymbolFunction(getTypedSymbol(keySymbol));
-                //setTypedString(TypingController.applySymbolToString(typedString, getTypedSymbol(keySymbol)));
             }
         };
     }
@@ -307,18 +325,9 @@ public class TypingController {
      * @param keyStr the invalid key code to string
      */
     private void showInvalidKeyAlert(String keyStr) {
-        Alert alert = new Alert(AlertType.WARNING);
-        alert.setTitle("INVALID KEY INPUT");
-        alert.setContentText("Please only use the keys displayed on the virtual keyboard.");
-        
-        Label headerLabel = new Label("INVALID INPUT: " + keyStr);
-        headerLabel.setFont(Font.font(25));
-        headerLabel.setAlignment(Pos.CENTER);
-        headerLabel.setStyle("-fx-text-fill: red;");
-        
-        alert.getDialogPane().setHeader(headerLabel);
-        alert.showAndWait();
+        errorMessageLabel.setText(String.format(" INVALID KEY INPUT - %S ", keyStr));
     }
+    
     
     /**
      * Checks if the typed string matches the string to type, and goes to the next lien to type if yes.
@@ -406,10 +415,14 @@ public class TypingController {
      * @return the final symbol, after checking for shift presses
      */
     private String getTypedSymbol(String keySymbol) {
-        if (!(keySymbol.length() == 1 && Character.isLetter(keySymbol.toCharArray()[0]))) {
+        if (keySymbol.length() != 1) {
             return keySymbol;
         }
         char symbol = keySymbol.toCharArray()[0];
+        if (!Character.isLetter(symbol)) {
+            return shiftPressed ? SHIFTLOCK_SYMBOLS.getOrDefault(keySymbol, keySymbol) : keySymbol;
+        }
+        
         return ((shiftPressed || capsToggled)? Character.toUpperCase(symbol) : Character.toLowerCase(symbol)) + "";
     }
     
