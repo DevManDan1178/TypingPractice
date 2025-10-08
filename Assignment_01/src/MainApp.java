@@ -1,4 +1,3 @@
-
 /**
  *
  * @author Daniel Orejuela Liu
@@ -11,7 +10,6 @@ import javafx.stage.Stage;
 public class MainApp extends Application {
     //MainApp.java launches the app and sets up the main scene.
 
-    
     private static String[] PRACTICE_STRINGS = {
         "Try typing this text. Do it as quickly and accurately as you can.",
         "Next type another line of input data.",
@@ -23,7 +21,6 @@ public class MainApp extends Application {
         "I paid 100$ for 10% of a fish & chips company's stock.",
         "Something cool: [triangles] <| |> /\\",
         "System.out.println(NO_MORE_LINES_ALERT + \"- I guess this is it?\")"
-
     };
     /**
      * @param args the command line arguments
@@ -45,6 +42,6 @@ public class MainApp extends Application {
         scene.setOnKeyReleased(typingController.getKeyEventHandler(false));
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
 }
+
