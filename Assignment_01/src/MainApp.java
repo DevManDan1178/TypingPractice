@@ -12,7 +12,7 @@ public class MainApp extends Application {
 
     private static String[] PRACTICE_STRINGS = {
         "Try typing this text. Do it as quickly and accurately as you can.",
-        "Next type another line of input data.",
+        "Next, type another line of input data.",
         "The quick brown fox jumps over the lazy dog.",
         "Five big quacking zephyrs jolt my wax bed.",
         "Sympathizing would fix Quaker objectives.",
