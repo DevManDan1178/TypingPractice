@@ -1,4 +1,3 @@
-[PROGRAM DEVELOPMENT IN A GRAPHICAL ENVIRONMENT]
 # Typing Tutor - JavaFX Assignment 01
 
 ## Objective
@@ -58,3 +57,6 @@ Two entry points to the same typing program: 
 
 https://www.typing.com/student/lessons/328/common-english-words  
 https://www.typing.com/student/lessons/359/j-f-and-space  
+
+
+[420-SF3-RE PROGRAM DEVELOPMENT IN A GRAPHICAL ENVIRONMENT]
