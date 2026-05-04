@@ -1,3 +1,5 @@
+## This project is an assignment from my semester 3 programming course at Vanier College.
+
 # Typing Tutor - JavaFX Assignment 01
 
 ## Objective
